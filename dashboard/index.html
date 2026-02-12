@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Élégance Parfum</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2c1810;
+            --secondary: #d4af37;
+            --accent: #8b6f47;
+            --light: #f8f5f0;
+            --white: #ffffff;
+            --text: #333333;
+            --gray: #666666;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --info: #3498db;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: var(--text);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--primary);
+            color: var(--white);
+            padding: 2rem 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h2 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 1.5rem 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s;
+            opacity: 0.7;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(212, 175, 55, 0.1);
+            opacity: 1;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .menu-icon {
+            font-size: 1.3rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--white);
+            padding: 1.5rem 2rem;
+            margin: -2rem -2rem 2rem -2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.8rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-info h3 {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-info .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .stat-icon.success { background: rgba(39, 174, 96, 0.1); }
+        .stat-icon.warning { background: rgba(243, 156, 18, 0.1); }
+        .stat-icon.info { background: rgba(52, 152, 219, 0.1); }
+        .stat-icon.primary { background: rgba(44, 24, 16, 0.1); }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        tbody tr {
+            transition: all 0.3s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+        }
+
+        .badge-info {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--info);
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn.edit {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--info);
+        }
+
+        .action-btn.delete {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Product Image Preview */
+        .product-icon {
+            font-size: 2rem;
+        }
+
+        /* Stock Alert */
+        .stock-low {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        .stock-ok {
+            color: var(--success);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>ÉLÉGANCE</h2>
+            <p>Admin Dashboard</p>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="#" class="active" onclick="showSection('dashboard')">
+                    <span class="menu-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('products')">
+                    <span class="menu-icon">🛍️</span>
+                    <span>Products</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('orders')">
+                    <span class="menu-icon">📦</span>
+                    <span>Orders</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('inventory')">
+                    <span class="menu-icon">📋</span>
+                    <span>Inventory</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('customers')">
+                    <span class="menu-icon">👥</span>
+                    <span>Customers</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('analytics')">
+                    <span class="menu-icon">📈</span>
+                    <span>Analytics</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('settings')">
+                    <span class="menu-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            <div class="user-info">
+                <div>
+                    <div style="font-weight: 600;">Admin User</div>
+                    <div style="font-size: 0.85rem; color: var(--gray);">admin@elegance.com</div>
+                </div>
+                <div class="user-avatar">👤</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Total Revenue</h3>
+                        <div class="stat-number">$24,567</div>
+                        <div style="color: var(--success); font-size: 0.85rem; margin-top: 0.5rem;">
+                            ↑ 12.5% from last month
+                        </div>
+                    </div>
+                    <div class="stat-icon success">💰</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Total Orders</h3>
+                        <div class="stat-number">156</div>
+                        <div style="color: var(--success); font-size: 0.85rem; margin-top: 0.5rem;">
+                            ↑ 8.2% from last month
+                        </div>
+                    </div>
+                    <div class="stat-icon info">📦</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Products</h3>
+                        <div class="stat-number">12</div>
+                        <div style="color: var(--gray); font-size: 0.85rem; margin-top: 0.5rem;">
+                            Active products
+                        </div>
+                    </div>
+                    <div class="stat-icon warning">🛍️</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Customers</h3>
+                        <div class="stat-number">89</div>
+                        <div style="color: var(--success); font-size: 0.85rem; margin-top: 0.5rem;">
+                            ↑ 15 new this month
+                        </div>
+                    </div>
+                    <div class="stat-icon primary">👥</div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Orders</h2>
+                    <button class="btn btn-primary btn-sm" onclick="showSection('orders')">View All</button>
+                </div>
+                <div class="table-container">
+                    <table id="recentOrdersTable">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Products</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Low Stock Alert -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Low Stock Alert</h2>
+                    <button class="btn btn-warning btn-sm" onclick="showSection('inventory')">Manage Inventory</button>
+                </div>
+                <div class="table-container">
+                    <table id="lowStockTable">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">All Products</h2>
+                    <button class="btn btn-primary" onclick="openAddProductModal()">
+                        ➕ Add New Product
+                    </button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search products..." onkeyup="searchProducts(this.value)">
+                </div>
+                <div class="table-container">
+                    <table id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>Icon</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Orders Section -->
+        <section id="orders" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">All Orders</h2>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <select class="form-group select" onchange="filterOrders(this.value)" style="padding: 0.7rem; border: 1px solid #ddd; border-radius: 8px;">
+                            <option value="all">All Orders</option>
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Email</th>
+                                <th>Products</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inventory Section -->
+        <section id="inventory" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Inventory Management</h2>
+                    <button class="btn btn-success" onclick="updateAllStock()">
+                        🔄 Update All Stock
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Min Stock</th>
+                                <th>Max Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customers Section -->
+        <section id="customers" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Customers</h2>
+                    <button class="btn btn-primary">Export List</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search customers...">
+                </div>
+                <div class="table-container">
+                    <table id="customersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Orders</th>
+                                <th>Total Spent</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="content-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Avg Order Value</h3>
+                        <div class="stat-number">$157.48</div>
+                    </div>
+                    <div class="stat-icon info">💳</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Conversion Rate</h3>
+                        <div class="stat-number">3.2%</div>
+                    </div>
+                    <div class="stat-icon success">📊</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Customer Retention</h3>
+                        <div class="stat-number">68%</div>
+                    </div>
+                    <div class="stat-icon warning">🎯</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Products Sold</h3>
+                        <div class="stat-number">342</div>
+                    </div>
+                    <div class="stat-icon primary">📈</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Top Selling Products</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Units Sold</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topProductsTable">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="content-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Store Settings</h2>
+                </div>
+                <form onsubmit="saveSettings(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Store Name</label>
+                            <input type="text" value="Élégance Parfum">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Email</label>
+                            <input type="email" value="info@eleganceparfum.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" value="+1 (555) 123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label>Currency</label>
+                            <select>
+                                <option>USD ($)</option>
+                                <option>EUR (€)</option>
+                                <option>GBP (£)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Store Address</label>
+                        <textarea rows="3">123 Luxury Ave, Paris, France</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+                        💾 Save Settings
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Add/Edit Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Add New Product</h2>
+                <button class="close-modal" onclick="closeProductModal()">×</button>
+            </div>
+            <form onsubmit="saveProduct(event)">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="productCategory" required>
+                            <option value="women">Women</option>
+                            <option value="men">Men</option>
+                            <option value="unisex">Unisex</option>
+                            <option value="luxury">Luxury</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price ($)</label>
+                        <input type="number" id="productPrice" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Stock Quantity</label>
+                        <input type="number" id="productStock" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Icon (Emoji)</label>
+                        <input type="text" id="productIcon" placeholder="🌹" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="productDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Badge (Optional)</label>
+                    <input type="text" id="productBadge" placeholder="New, Bestseller, etc.">
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">
+                    💾 Save Product
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Update Stock Modal -->
+    <div class="modal" id="stockModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Update Stock</h2>
+                <button class="close-modal" onclick="closeStockModal()">×</button>
+            </div>
+            <form onsubmit="saveStock(event)">
+                <input type="hidden" id="stockProductId">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="stockProductName" disabled>
+                </div>
+                <div class="form-group">
+                    <label>New Stock Quantity</label>
+                    <input type="number" id="stockQuantity" required min="0">
+                </div>
+                <button type="submit" class="btn btn-success" style="margin-top: 1rem; width: 100%;">
+                    🔄 Update Stock
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample Data
+        let products = [
+            { id: 1, name: "Noir Élégance", category: "women", price: 129.99, stock: 45, icon: "🌹", badge: "New", description: "Sophisticated floral notes with vanilla" },
+            { id: 2, name: "Royal Oud", category: "men", price: 159.99, stock: 12, icon: "🎩", badge: "Bestseller", description: "Rich oud with leather accents" },
+            { id: 3, name: "Mystique", category: "unisex", price: 139.99, stock: 8, icon: "✨", badge: "", description: "Oriental woody fragrance" },
+            { id: 4, name: "Diamond Rose", category: "luxury", price: 299.99, stock: 35, icon: "💎", badge: "Luxury", description: "Exclusive rose absolute" },
+            { id: 5, name: "Citrus Bloom", category: "women", price: 109.99, stock: 52, icon: "🍊", badge: "", description: "Fresh citrus with jasmine" },
+            { id: 6, name: "Midnight Pour Homme", category: "men", price: 149.99, stock: 28, icon: "🌙", badge: "New", description: "Spicy amber with musk" },
+            { id: 7, name: "Velvet Touch", category: "women", price: 119.99, stock: 15, icon: "🌸", badge: "", description: "Soft vanilla with sandalwood" },
+            { id: 8, name: "Ocean Breeze", category: "unisex", price: 99.99, stock: 42, icon: "🌊", badge: "Bestseller", description: "Aquatic fresh fragrance" },
+            { id: 9, name: "Imperial Gold", category: "luxury", price: 349.99, stock: 5, icon: "👑", badge: "Luxury", description: "Rare saffron and amber" },
+            { id: 10, name: "Savage Spirit", category: "men", price: 139.99, stock: 31, icon: "🦁", badge: "", description: "Bold bergamot with cedar" },
+            { id: 11, name: "Jasmine Dreams", category: "women", price: 124.99, stock: 6, icon: "🌼", badge: "New", description: "Pure jasmine essence" },
+            { id: 12, name: "Essence Royale", category: "luxury", price: 399.99, stock: 22, icon: "💫", badge: "Luxury", description: "Ultimate luxury fragrance" }
+        ];
+
+        let orders = [
+            { id: "ORD-001", customer: "Sarah Johnson", email: "sarah@email.com", products: 2, total: 289.98, status: "delivered", date: "2026-02-10" },
+            { id: "ORD-002", customer: "Michael Chen", email: "michael@email.com", products: 1, total: 159.99, status: "shipped", date: "2026-02-11" },
+            { id: "ORD-003", customer: "Emma Wilson", email: "emma@email.com", products: 3, total: 419.97, status: "processing", date: "2026-02-11" },
+            { id: "ORD-004", customer: "James Brown", email: "james@email.com", products: 1, total: 139.99, status: "pending", date: "2026-02-12" },
+            { id: "ORD-005", customer: "Lisa Martinez", email: "lisa@email.com", products: 2, total: 349.98, status: "processing", date: "2026-02-12" },
+            { id: "ORD-006", customer: "David Lee", email: "david@email.com", products: 1, total: 299.99, status: "shipped", date: "2026-02-12" },
+            { id: "ORD-007", customer: "Sophie Anderson", email: "sophie@email.com", products: 4, total: 579.96, status: "delivered", date: "2026-02-09" },
+            { id: "ORD-008", customer: "Robert Taylor", email: "robert@email.com", products: 1, total: 109.99, status: "pending", date: "2026-02-12" }
+        ];
+
+        let customers = [
+            { name: "Sarah Johnson", email: "sarah@email.com", phone: "+1 555-0101", orders: 5, totalSpent: 1249.95, joined: "2025-11-15" },
+            { name: "Michael Chen", email: "michael@email.com", phone: "+1 555-0102", orders: 3, totalSpent: 629.97, joined: "2025-12-01" },
+            { name: "Emma Wilson", email: "emma@email.com", phone: "+1 555-0103", orders: 7, totalSpent: 2149.93, joined: "2025-10-20" },
+            { name: "James Brown", email: "james@email.com", phone: "+1 555-0104", orders: 2, totalSpent: 299.98, joined: "2026-01-05" },
+            { name: "Lisa Martinez", email: "lisa@email.com", phone: "+1 555-0105", orders: 4, totalSpent: 899.96, joined: "2025-11-28" }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            loadOrders();
+            loadInventory();
+            loadCustomers();
+            loadRecentOrders();
+            loadLowStock();
+            loadTopProducts();
+        });
+
+        // Navigation
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(section).classList.add('active');
+            
+            // Update active menu item
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+            event.target.closest('a').classList.add('active');
+            
+            // Update page title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'products': 'Products',
+                'orders': 'Orders',
+                'inventory': 'Inventory Management',
+                'customers': 'Customers',
+                'analytics': 'Analytics',
+                'settings': 'Settings'
+            };
+            document.getElementById('pageTitle').textContent = titles[section];
+        }
+
+        // Load Products
+        function loadProducts() {
+            const tbody = document.querySelector('#productsTable tbody');
+            tbody.innerHTML = '';
+            
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span class="product-icon">${product.icon}</span></td>
+                    <td>${product.name}</td>
+                    <td><span class="badge badge-info">${product.category}</span></td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td class="${product.stock < 10 ? 'stock-low' : 'stock-ok'}">${product.stock}</td>
+                    <td><span class="badge ${product.stock > 0 ? 'badge-success' : 'badge-danger'}">${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn edit" onclick="editProduct(${product.id})" title="Edit">✏️</button>
+                            <button class="action-btn delete" onclick="deleteProduct(${product.id})" title="Delete">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load Orders
+        function loadOrders() {
+            const tbody = document.querySelector('#ordersTable tbody');
+            tbody.innerHTML = '';
+            
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+                const statusBadges = {
+                    'pending': 'badge-warning',
+                    'processing': 'badge-info',
+                    'shipped': 'badge-info',
+                    'delivered': 'badge-success'
+                };
+                
+                row.innerHTML = `
+                    <td><strong>${order.id}</strong></td>
+                    <td>${order.customer}</td>
+                    <td>${order.email}</td>
+                    <td>${order.products}</td>
+                    <td><strong>$${order.total.toFixed(2)}</strong></td>
+                    <td><span class="badge ${statusBadges[order.status]}">${order.status.toUpperCase()}</span></td>
+                    <td>${order.date}</td>
+                    <td>
+                        <select onchange="updateOrderStatus(${orders.indexOf(order)}, this.value)" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
+                            <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load Inventory
+        function loadInventory() {
+            const tbody = document.querySelector('#inventoryTable tbody');
+            tbody.innerHTML = '';
+            
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                const minStock = 10;
+                const maxStock = 100;
+                const status = product.stock < minStock ? 'Low' : product.stock > maxStock ? 'Overstocked' : 'Optimal';
+                const statusClass = product.stock < minStock ? 'badge-danger' : product.stock > maxStock ? 'badge-warning' : 'badge-success';
+                
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td><span class="badge badge-info">${product.category}</span></td>
+                    <td class="${product.stock < minStock ? 'stock-low' : ''}">${product.stock}</td>
+                    <td>${minStock}</td>
+                    <td>${maxStock}</td>
+                    <td><span class="badge ${statusClass}">${status}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="openStockModal(${product.id})">Update Stock</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load Customers
+        function loadCustomers() {
+            const tbody = document.querySelector('#customersTable tbody');
+            tbody.innerHTML = '';
+            
+            customers.forEach(customer => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${customer.name}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.phone}</td>
+                    <td><span class="badge badge-info">${customer.orders}</span></td>
+                    <td><strong>$${customer.totalSpent.toFixed(2)}</strong></td>
+                    <td>${customer.joined}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load Recent Orders (Dashboard)
+        function loadRecentOrders() {
+            const tbody = document.querySelector('#recentOrdersTable tbody');
+            tbody.innerHTML = '';
+            
+            const recentOrders = orders.slice(0, 5);
+            recentOrders.forEach(order => {
+                const row = document.createElement('tr');
+                const statusBadges = {
+                    'pending': 'badge-warning',
+                    'processing': 'badge-info',
+                    'shipped': 'badge-info',
+                    'delivered': 'badge-success'
+                };
+                
+                row.innerHTML = `
+                    <td><strong>${order.id}</strong></td>
+                    <td>${order.customer}</td>
+                    <td>${order.products}</td>
+                    <td><strong>$${order.total.toFixed(2)}</strong></td>
+                    <td><span class="badge ${statusBadges[order.status]}">${order.status.toUpperCase()}</span></td>
+                    <td>${order.date}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load Low Stock (Dashboard)
+        function loadLowStock() {
+            const tbody = document.querySelector('#lowStockTable tbody');
+            tbody.innerHTML = '';
+            
+            const lowStockProducts = products.filter(p => p.stock < 10).slice(0, 5);
+            lowStockProducts.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td><span class="badge badge-info">${product.category}</span></td>
+                    <td class="stock-low">${product.stock}</td>
+                    <td><span class="badge badge-danger">Low Stock</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="openStockModal(${product.id})">Restock</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load Top Products (Analytics)
+        function loadTopProducts() {
+            const tbody = document.getElementById('topProductsTable');
+            tbody.innerHTML = '';
+            
+            const topProducts = [
+                { name: "Royal Oud", category: "men", sold: 67, revenue: 10719.33 },
+                { name: "Noir Élégance", category: "women", sold: 54, revenue: 7019.46 },
+                { name: "Ocean Breeze", category: "unisex", sold: 48, revenue: 4799.52 },
+                { name: "Diamond Rose", category: "luxury", sold: 31, revenue: 9299.69 },
+                { name: "Citrus Bloom", category: "women", sold: 42, revenue: 4619.58 }
+            ];
+            
+            topProducts.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td><span class="badge badge-info">${product.category}</span></td>
+                    <td>${product.sold}</td>
+                    <td><strong>$${product.revenue.toFixed(2)}</strong></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Product Modal Functions
+        let editingProductId = null;
+
+        function openAddProductModal() {
+            editingProductId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Product';
+            document.getElementById('productName').value = '';
+            document.getElementById('productCategory').value = 'women';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productStock').value = '';
+            document.getElementById('productIcon').value = '';
+            document.getElementById('productDescription').value = '';
+            document.getElementById('productBadge').value = '';
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function editProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            
+            editingProductId = id;
+            document.getElementById('modalTitle').textContent = 'Edit Product';
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productCategory').value = product.category;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productStock').value = product.stock;
+            document.getElementById('productIcon').value = product.icon;
+            document.getElementById('productDescription').value = product.description;
+            document.getElementById('productBadge').value = product.badge;
+            document.getElementById('productModal').classList.add('active');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.remove('active');
+        }
+
+        function saveProduct(event) {
+            event.preventDefault();
+            
+            const productData = {
+                name: document.getElementById('productName').value,
+                category: document.getElementById('productCategory').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                stock: parseInt(document.getElementById('productStock').value),
+                icon: document.getElementById('productIcon').value,
+                description: document.getElementById('productDescription').value,
+                badge: document.getElementById('productBadge').value
+            };
+            
+            if (editingProductId) {
+                const index = products.findIndex(p => p.id === editingProductId);
+                products[index] = { ...products[index], ...productData };
+                alert('Product updated successfully!');
+            } else {
+                const newId = Math.max(...products.map(p => p.id)) + 1;
+                products.push({ id: newId, ...productData });
+                alert('Product added successfully!');
+            }
+            
+            loadProducts();
+            loadInventory();
+            loadLowStock();
+            closeProductModal();
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                products = products.filter(p => p.id !== id);
+                loadProducts();
+                loadInventory();
+                loadLowStock();
+                alert('Product deleted successfully!');
+            }
+        }
+
+        // Stock Modal Functions
+        let currentStockProductId = null;
+
+        function openStockModal(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            
+            currentStockProductId = id;
+            document.getElementById('stockProductId').value = id;
+            document.getElementById('stockProductName').value = product.name;
+            document.getElementById('stockQuantity').value = product.stock;
+            document.getElementById('stockModal').classList.add('active');
+        }
+
+        function closeStockModal() {
+            document.getElementById('stockModal').classList.remove('active');
+        }
+
+        function saveStock(event) {
+            event.preventDefault();
+            
+            const newStock = parseInt(document.getElementById('stockQuantity').value);
+            const product = products.find(p => p.id === currentStockProductId);
+            
+            if (product) {
+                product.stock = newStock;
+                loadProducts();
+                loadInventory();
+                loadLowStock();
+                closeStockModal();
+                alert('Stock updated successfully!');
+            }
+        }
+
+        function updateAllStock() {
+            if (confirm('This will set all products to optimal stock levels. Continue?')) {
+                products.forEach(p => p.stock = 50);
+                loadProducts();
+                loadInventory();
+                loadLowStock();
+                alert('All stock levels updated!');
+            }
+        }
+
+        // Filter and Search Functions
+        function filterOrders(status) {
+            const tbody = document.querySelector('#ordersTable tbody');
+            tbody.innerHTML = '';
+            
+            const filtered = status === 'all' ? orders : orders.filter(o => o.status === status);
+            
+            filtered.forEach(order => {
+                const row = document.createElement('tr');
+                const statusBadges = {
+                    'pending': 'badge-warning',
+                    'processing': 'badge-info',
+                    'shipped': 'badge-info',
+                    'delivered': 'badge-success'
+                };
+                
+                row.innerHTML = `
+                    <td><strong>${order.id}</strong></td>
+                    <td>${order.customer}</td>
+                    <td>${order.email}</td>
+                    <td>${order.products}</td>
+                    <td><strong>$${order.total.toFixed(2)}</strong></td>
+                    <td><span class="badge ${statusBadges[order.status]}">${order.status.toUpperCase()}</span></td>
+                    <td>${order.date}</td>
+                    <td>
+                        <select onchange="updateOrderStatus(${orders.indexOf(order)}, this.value)" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                            <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
+                            <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateOrderStatus(index, newStatus) {
+            orders[index].status = newStatus;
+            loadOrders();
+            loadRecentOrders();
+            alert('Order status updated successfully!');
+        }
+
+        function searchProducts(query) {
+            const tbody = document.querySelector('#productsTable tbody');
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(query.toLowerCase()) ||
+                p.category.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            tbody.innerHTML = '';
+            filtered.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span class="product-icon">${product.icon}</span></td>
+                    <td>${product.name}</td>
+                    <td><span class="badge badge-info">${product.category}</span></td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td class="${product.stock < 10 ? 'stock-low' : 'stock-ok'}">${product.stock}</td>
+                    <td><span class="badge ${product.stock > 0 ? 'badge-success' : 'badge-danger'}">${product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn edit" onclick="editProduct(${product.id})" title="Edit">✏️</button>
+                            <button class="action-btn delete" onclick="deleteProduct(${product.id})" title="Delete">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function saveSettings(event) {
+            event.preventDefault();
+            alert('Settings saved successfully!');
+        }
+    </script>
+</body>
+</html>
